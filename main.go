@@ -15,18 +15,15 @@ func main() {
 }
 
 func readfile(filename string) (textstream string) {
-	file, err := os.Open(filename)
+	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
-	b, _ := ioutil.ReadAll(file)
 	textstream = string(b)
 	return
 }
 func parsetext(text string) (words []string) {
-	re := regexp.MustCompile(`\w{3,}`)
-	words = re.FindAllString(strings.ToLower(text), -1)
+	words = regexp.MustCompile(`\w{3,}`).FindAllString(strings.ToLower(text), -1)
 	return
 }
 
@@ -37,6 +34,7 @@ func removestopwords(words []string) (fixedwords []string) {
 		for _, stopword := range stopwords {
 			if word == stopword {
 				notstopword = false
+				break
 			}
 		}
 		if notstopword {
@@ -68,8 +66,7 @@ func sortfreqs(words []string, freqs []int) (sortedwords []string, sortedfreqs [
 		largest, index := freqs[0], 0
 		for i, freq := range freqs {
 			if freq > largest {
-				largest = freq
-				index = i
+				largest, index = freq, i
 			}
 		}
 		sortedwords = append(sortedwords, words[index])
