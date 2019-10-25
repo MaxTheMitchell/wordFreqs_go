@@ -23,7 +23,7 @@ func readfile(filename string) (textstream string) {
 	return
 }
 func parsetext(text string) (words []string) {
-	words = regexp.MustCompile(`\w{3,}`).FindAllString(strings.ToLower(text), -1)
+	words = regexp.MustCompile(`(\w|'){3,}`).FindAllString(strings.ToLower(text), -1)
 	return
 }
 
@@ -78,6 +78,10 @@ func sortfreqs(words []string, freqs []int) (sortedwords []string, sortedfreqs [
 }
 func printtop(words []string, freqs []int) {
 	for i := 0; i < 25; i++ {
+		if i >= len(freqs) {
+			fmt.Println("These are all the words on the file")
+			break
+		}
 		fmt.Println(words[i] + " " + strconv.Itoa(freqs[i]))
 	}
 }
