@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -46,38 +45,42 @@ func removestopwords(words []string) (fixedwords []string) {
 	}
 	return
 }
-func countfreqs(words []string) (wordfreqs map[string]int) {
-	wordfreqs = make(map[string]int)
+func countfreqs(words []string) (newwords []string, freqs []int) {
 	for _, word := range words {
 		notfoundword := true
-		for mapword := range wordfreqs {
-			if word == mapword {
-				wordfreqs[mapword]++
+		for i, newword := range newwords {
+			if word == newword {
+				freqs[i]++
 				notfoundword = false
 				break
 			}
 		}
 		if notfoundword {
-			wordfreqs[word] = 1
+			newwords = append(newwords, word)
+			freqs = append(freqs, 1)
 		}
 	}
 	return
 }
 
-func sortfreqs(wordfreqs map[string]int) (sortedfreqs map[int]string, topfreqs []int) {
-	sortedfreqs = make(map[int]string)
-	for word, freq := range wordfreqs {
-		sortedfreqs[freq] = word
-		topfreqs = append(topfreqs, freq)
+func sortfreqs(words []string, freqs []int) (sortedwords []string, sortedfreqs []int) {
+	for len(freqs) != 0 {
+		largest, index := freqs[0], 0
+		for i, freq := range freqs {
+			if freq > largest {
+				largest = freq
+				index = i
+			}
+		}
+		sortedwords = append(sortedwords, words[index])
+		sortedfreqs = append(sortedfreqs, freqs[index])
+		freqs = freqs[:index+copy(freqs[index:], freqs[index+1:])]
+		words = words[:index+copy(words[index:], words[index+1:])]
 	}
-	sort.Sort(sort.Reverse(sort.IntSlice(topfreqs)))
 	return
 }
-func printtop(sortedfreqs map[int]string, topfreqs []int) {
-	for i, freq := range topfreqs {
-		fmt.Println(sortedfreqs[freq] + " " + strconv.Itoa(freq))
-		if i >= 25 {
-			break
-		}
+func printtop(words []string, freqs []int) {
+	for i := 0; i < 25; i++ {
+		fmt.Println(words[i] + " " + strconv.Itoa(freqs[i]))
 	}
 }
